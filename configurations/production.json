@@ -1,0 +1,17 @@
+{
+  "web": {
+    "httpport": 80,
+    "httpsport": 443
+  },
+  "AWS_S3": {},
+  "mailer_options": {},
+  "twilio": {},
+  "smsIndia": {},
+  "mongo": {
+    "location": "mongodb://localhost/poirate",
+    "Debug": false
+  },
+  "geocoder": {},
+  "debug": false,
+  "logLevel": 0
+}

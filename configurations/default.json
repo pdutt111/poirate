@@ -1,0 +1,89 @@
+{
+  "web": {
+    "httpport": 1337,
+    "httpsport": 443
+  },
+  "AWS_S3": {},
+  "mailer_options": {},
+  "twilio": {},
+  "smsIndia": {},
+  "mongo": {
+    "location": "mongodb://localhost/poirate",
+    "Debug": false
+  },
+  "error": {
+    "webtoken": {
+      "expired": {
+        "result": "error",
+        "description": "expired web token"
+      },
+      "unknown": {
+        "result": "error",
+        "description": "unknown web token"
+      },
+      "notprovided": {
+        "result": "error",
+        "description": "no web token provided"
+      }
+    },
+    "sms": {
+      "smslimit": {
+        "result": "error",
+        "description": "unusual traffic from your ip has lead to blocking of your service"
+      },
+      "notsent": {
+        "result": "error",
+        "description": "unable to send sms"
+      }
+    },
+    "user": {
+      "doesnotexist": {
+        "result": "error",
+        "description": "no such user present"
+      },
+      "exists": {
+        "result": "error",
+        "description": "user already present"
+      },
+      "errorcreating": {
+        "result": "error",
+        "description": "error creating user"
+      }
+    },
+    "nodetails": {
+      "result": "error",
+      "description": "insufficient data"
+    },
+    "unauthorized": {
+      "result": "error",
+      "description": "unauthorized"
+    },
+    "dberror": {
+      "result": "error",
+      "description": "there was an error in database"
+    },
+    "uploaderr": {
+      "result": "error",
+      "description": "file not attached"
+    },
+    "internalservererror": {
+      "result": "error",
+      "description": "internal server error"
+    },
+    "badrequest": {
+      "result": "error",
+      "description": "bad request"
+    },
+    "notfound": {
+      "result": "error",
+      "description": "not found"
+    }
+  },
+  "geocoder": {},
+  "debug": true,
+  "logLevel": 0,
+  "jwtsecret": "poirate@132",
+  "ok": {
+    "result": "ok"
+  }
+}

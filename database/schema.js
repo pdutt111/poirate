@@ -5,16 +5,16 @@
  * Created by pariskshitdutt on 06/09/14.
  */
 var mongoose = require('mongoose');
-var config=require('../configurations/config');
-mongoose.connect(config.mongo.location);
+var config = require('config');
+mongoose.connect(config.get('mongo.location'));
 var db = mongoose.connection;
 var userdef;
 var photodef;
 var appInfo;
 var notifs;
 var Schema = mongoose.Schema;
-mongoose.set('debug', config.mongoDebug);
-var city=new Schema({
+mongoose.set('debug', config.get('mongo.debug'));
+var citySchema=new Schema({
     name: String,
     save_date: {type: Date, default: Date.now},
     loc: {index: '2dsphere', type: [Number]},
@@ -82,7 +82,7 @@ db.once('open', function callback () {
             log.info('User indexing complete');
         }
     });
-    photodef=mongoose.model('Photo',photoSchema);
+    photodef=mongoose.model('cities',citySchema);
     photodef.on('index', function(err) {
         if (err) {
             log.error('photo index error: %s', err);
