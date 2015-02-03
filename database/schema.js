@@ -5,7 +5,7 @@
  * Created by pariskshitdutt on 06/09/14.
  */
 var mongoose = require('mongoose');
-
+var config=require('../configurations/config');
 mongoose.connect(config.mongo.location);
 var db = mongoose.connection;
 var userdef;
