@@ -7,6 +7,7 @@
 var mongoose = require('mongoose');
 var config = require('config');
 mongoose.connect(config.get('mongo.location'));
+var log = require('tracer').colorConsole(config.get('log'));
 var db = mongoose.connection;
 var userdef;
 var photodef;
@@ -110,9 +111,6 @@ db.once('open', function callback () {
     exports.getphotodef=photodef;
     exports.getAppInfo=appInfo;
     exports.getnotifs=notifs;
-    events.emitter.emit("db_data")
-    //main.connectioncallback(userdef,photodef,appInfo);
-//    var migration=require('./dbmigration.js');
-//    migration.runmigration();
+    events.emitter.emit("db_data_ready")
 });
 

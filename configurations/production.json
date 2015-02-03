@@ -13,5 +13,7 @@
   },
   "geocoder": {},
   "debug": false,
-  "logLevel": 0
+  "log": {
+    "level": 0
+  }
 }

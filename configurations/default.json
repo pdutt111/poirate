@@ -81,9 +81,18 @@
   },
   "geocoder": {},
   "debug": true,
-  "logLevel": 0,
   "jwtsecret": "poirate@132",
   "ok": {
     "result": "ok"
+  },
+  "log": {
+    "format": [
+      "{{timestamp}} <{{title}}> {{message}} (in {{file}}:{{line}})",
+      {
+        "error": "{{timestamp}} <{{title}}> {{message}} (in {{file}}:{{line}})\nCall Stack:\n{{stack}}"
+      }
+    ],
+    "dateformat": "HH:MM:ss.L",
+    "level": 0
   }
 }
