@@ -9,7 +9,7 @@
   "smsIndia": {},
   "mongo": {
     "location": "mongodb://localhost/poirate",
-    "Debug": false
+    "debug": true
   },
   "error": {
     "webtoken": {

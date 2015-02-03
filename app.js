@@ -4,9 +4,21 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-
+var config = require('config');
+var log = require('tracer').colorConsole(config.get('log'));
+var events = require('./events');
+var db=require('./database/schema')
 var routes = require('./routes/index');
 var users = require('./routes/users');
+
+
+var userdef;
+var citydef;
+events.emitter.on("db_data",function(){
+    log.info("data models recieved");
+    citydef=db.getcitydef;
+    userdef=db.getuserdef;
+});
 
 var app = express();
 

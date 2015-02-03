@@ -1,17 +1,15 @@
 /**
- * Created by pariskshitdutt on 02/02/15.
- */
-/**
  * Created by pariskshitdutt on 06/09/14.
  */
 var mongoose = require('mongoose');
 var config = require('config');
-mongoose.connect(config.get('mongo.location'));
+var events = require('../events');
 var log = require('tracer').colorConsole(config.get('log'));
+
+mongoose.connect(config.mongo.location);
 var db = mongoose.connection;
 var userdef;
-var photodef;
-var appInfo;
+var citydef;
 var notifs;
 var Schema = mongoose.Schema;
 mongoose.set('debug', config.get('mongo.debug'));
@@ -45,9 +43,9 @@ var userSchema=new Schema({
     email:[String],
     fb_id:String,
     gplus_id:String,
-    //friends:{type:[{user:{type:Schema.Types.ObjectId,ref:'User'},on_device_id:{type:String},phonenumber:Number,name:String
-    //    ,email:[String],_id:false,invite:{invited:{type:Boolean, default:false},date:Date,invite_type:{type:String,default:"invite"}}}]},
-    //phonenumber:[Number],
+    friends:{type:[{user:{type:Schema.Types.ObjectId,ref:'User'},on_device_id:{type:String},phonenumber:Number,name:String
+        ,email:[String],_id:false,invite:{invited:{type:Boolean, default:false},date:Date,invite_type:{type:String,default:"invite"}}}]},
+    phonenumber:[Number],
     is_testing:{type:Boolean,default:false},
     created_time:{type:Date,default:Date.now},
     modified_time:{type:Date,default:Date.now},
@@ -55,15 +53,15 @@ var userSchema=new Schema({
     fb_photo:String,
     fb_token:String,
     sync_date:[Date],
-    //bio:String,
+    bio:String,
     hashes:[{hash:{type: String},_id:false,photo:{type:Boolean,default:true},self:{type:Boolean,default:false}}],
     fb_token_validity:Date,
     gplus_photo:String,
     gplus_token:String,
     gplus_token_validity:String,
     name:String,
-    profile_pic:String
-    //location_logs:[{loc:{ index: '2dsphere',type: [Number]},date:Date,source:String,_id:false}]
+    profile_pic:String,
+    location_logs:[{loc:{ index: '2dsphere',type: [Number]},date:Date,source:String,_id:false}]
 });
 var notificationSchema=new Schema({
     to:[{type: Schema.Types.ObjectId, ref: 'User'}],
@@ -71,9 +69,10 @@ var notificationSchema=new Schema({
     type:String,
     created_time:{type:Date,default:Date.now}
 });
-
-db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', function callback () {
+db.on('error', function(err){
+    log.info(err);
+});
+db.once('open', function () {
     log.info("connected");
     userdef=mongoose.model('User',userSchema);
     userdef.on('index', function(err) {
@@ -83,20 +82,12 @@ db.once('open', function callback () {
             log.info('User indexing complete');
         }
     });
-    photodef=mongoose.model('cities',citySchema);
-    photodef.on('index', function(err) {
+    citydef=mongoose.model('Cities',citySchema);
+    citydef.on('index', function(err) {
         if (err) {
             log.error('photo index error: %s', err);
         } else {
             log.info('photo indexing complete');
-        }
-    });
-    appInfo=mongoose.model('AppInfo',appInfoSchema);
-    appInfo.on('index', function(err) {
-        if (err) {
-            log.error('appinfo index error: %s', err);
-        } else {
-            log.info('appinfo indexing complete');
         }
     });
     notifs=mongoose.model('Notifications',notificationSchema);
@@ -108,9 +99,8 @@ db.once('open', function callback () {
         }
     });
     exports.getuserdef= userdef;
-    exports.getphotodef=photodef;
-    exports.getAppInfo=appInfo;
+    exports.getcitydef=citydef;
     exports.getnotifs=notifs;
-    events.emitter.emit("db_data_ready")
+    events.emitter.emit("db_data");
 });
 
