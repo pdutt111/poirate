@@ -6,7 +6,7 @@ var config = require('config');
 var events = require('../events');
 var log = require('tracer').colorConsole(config.get('log'));
 
-mongoose.connect(config.mongo.location);
+mongoose.connect(config.get('mongo.location'));
 var db = mongoose.connection;
 var userdef;
 var citydef;
@@ -14,7 +14,7 @@ var notifs;
 var Schema = mongoose.Schema;
 mongoose.set('debug', config.get('mongo.debug'));
 var citySchema=new Schema({
-    name: String,
+    name: {type:String,index:true,unique:true,dropDups:true},
     save_date: {type: Date, default: Date.now},
     loc: {index: '2dsphere', type: [Number]},
     is_blocked: {type: Boolean, default: false},
@@ -25,14 +25,16 @@ var citySchema=new Schema({
     moderate_season_start:Number,
     moderate_season_end:Number,
     rating:{friends:Number,nature:Number,family:Number,wildlife:Number, spiritual:Number, lifestyle:Number, culture:Number},
+    overall_rating:Number,
     destination_score:Number,
     when_to_go:String,
     what_to_know:String,
+    get_around:String,
     name:String,
     state:String,
     photos:{type:[{_id:false,photo_id:String,api_name:String,display_pic:Boolean,image_url:String,user_id:String,user_profile_url:String,width:Number,Height:Number}]},
     activities:{type:[{activity_name:String,description:String,score:Number,activity_visit_time_start:String,
-        activity_visit_time_end:String,available_month_start:Number,available_month_end:Number,activity_type:String,photos:
+        activity_visit_time_end:String,available_month_start:Number,available_month_end:Number,activity_type:String,activity_time:Number,photos:
         {type:[{_id:false,photo_id:String,api_name:String,display_pic:Boolean,image_url:String,user_id:String,
             user_profile_url:String,width:Number,Height:Number}]},loc:{index: '2dsphere', type: [Number]},
     foursquare_checkins:Number}]}
