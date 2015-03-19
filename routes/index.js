@@ -17,8 +17,8 @@ events.emitter.on("db_data",function(){
 });
 
 /* GET home page. */
-router.get('/attractions',params({query:['id']}),function(req,res){
-  citytable.find({_id:new ObjectId(req.query.id)},"activities",function(err,rows){
+router.get('/attractions',params({query:['city_id']}),function(req,res){
+  citytable.find({_id:new ObjectId(req.query.city_id)},"activities",function(err,rows){
     res.json(rows);
   })
 });
@@ -33,15 +33,42 @@ router.get('/city',params({query:['search']}),function(req,res){
     res.status(400).json(config.get('error.badrequest'))
   }
 });
-router.get('/itinery',params({query:['city_id','pois','start_date','end_date']}),function(req,res){
-  if(pois.length>0) {
-    citytable.find({_id: new ObjectId(req.query.city_id),activities:{$in:req.query.pois}}, "activities", function (err, rows) {
-      var response = planTrip(rows,start_date,end_date);
+router.use('/itinery',function(req,res,next){
+  if(req.headers.authorization){
+    var token=req.headers.authorization.split(" ")[1];
+    if (token) {
+      try {
+        var decoded = jwt.decode(token, config.get('jwtsecret'));
+        var now = (new Date()).toISOString();
+        req.user = decoded.user;
+        usertable.findOne({_id:new ObjectId(req.user._id)}
+            ,"name profile_pic hashes phonenumber bio email",function(err,user){
+              if(err) {
+                log.warn(err);
+              }
+
+                req.user = user;
+                next();
+            });
+      } catch (err) {
+        next()
+      }
+    }else{
+      next();
+    }
+  } else {
+    next()
+  }
+})
+router.get('/itinery',params({query:['city_id','start_date','end_date']}),function(req,res){
+  if(req.query.pois) {
+    citytable.findOne({_id: new ObjectId(req.query.city_id),activities:{$in:req.query.pois}}, "activities", function (err, rows) {
+      var response = planTrip(rows.activities,req.query.start_date,req.query.end_date);
       res.json(response);
     });
   }else{
-    citytable.find({_id: new ObjectId(req.query.city_id)}, "activities", function (err, rows) {
-      var response = planTrip(rows,req.query.start_date,req.query.end_date);
+    citytable.findOne({_id: new ObjectId(req.query.city_id)}, "activities", function (err, rows) {
+      var response = planTrip(rows.activities,req.query.start_date,req.query.end_date);
       res.json(response);
     });
   }
@@ -60,9 +87,10 @@ function planTrip(rows,start_date,end_date){
         response[j]=[];
       }
       if(response[j].length<(rows.length/diffDays).toFixed(0)) {
-        response[j].push(rows[i]);
+        response[j].push(rows[i]._id);
       }
     }
   }
+  return response;
 }
 module.exports = router;

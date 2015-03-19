@@ -19,17 +19,16 @@ events.emitter.on("db_data",function(){
 });
 
 /* GET users listing. */
-router.get('/', function(req, res, next) {
+router.get('/cccc', function(req, res, next) {
   res.send('respond with a resource');
 });
 router.post('/createuser',params({body:['device_id']}),function(req,res){
-  try {
       var user = new usertable;
       user.devices.push({device_id:req.body.device_id});
       user.save(function (err) {
         if (err) {
           log.warn(err);
-          res.status(401).json(config.error.user.errorcreating);
+          res.status(401).json(config.get('error.user.errorcreating'));
         } else {
           var expires = new Date(moment().add(25, 'days').valueOf()).toISOString();
           var token = jwt.encode({
@@ -45,14 +44,11 @@ router.post('/createuser',params({body:['device_id']}),function(req,res){
           });
         }
       }.bind({user: user}));
-      usertable.update({'devices.device_id': req.body.device_id}, {$set: {'devices.$.active':false,modified_time: (new Date()).AsDateJs()}}, {multi: true}, function (err, info) {
+      usertable.update({'devices.device_id': req.body.device_id}, {$set: {'devices.$.active':false,modified_time: (new Date())}}, {multi: true}, function (err, info) {
         if (err&&info==0) {
           log.warn(err);
         }
       });
-    }catch(exception){
-      res.status(500).json(config.get('error.internalservererror'));
-    }
 });
 
 module.exports = router;
