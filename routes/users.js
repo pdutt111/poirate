@@ -5,6 +5,7 @@ var db=require('../database/schema');
 var jwt = require('jwt-simple');
 var ObjectId = require('mongoose').Types.ObjectId;
 var moment=require('moment');
+var params = require('parameters-middleware');
 var log = require('tracer').colorConsole(config.get('log'));
 var router = express.Router();
 
@@ -21,11 +22,8 @@ events.emitter.on("db_data",function(){
 router.get('/', function(req, res, next) {
   res.send('respond with a resource');
 });
-router.post('/createuser',function(req,res){
-  log.debug(req.body.device_id);
-
-  if(req.body.device_id) {
-    try {
+router.post('/createuser',params({body:['device_id']}),function(req,res){
+  try {
       var user = new usertable;
       user.devices.push({device_id:req.body.device_id});
       user.save(function (err) {
@@ -55,9 +53,6 @@ router.post('/createuser',function(req,res){
     }catch(exception){
       res.status(500).json(config.get('error.internalservererror'));
     }
-  }else{
-    res.status(401).json(config.get('error.user.doesnotexist'));
-  }
 });
 
 module.exports = router;

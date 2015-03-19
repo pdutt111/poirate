@@ -3,6 +3,7 @@ var events = require('../events');
 var config = require('config');
 var db=require('../database/schema');
 var ObjectId = require('mongoose').Types.ObjectId;
+var params = require('parameters-middleware');
 var log = require('tracer').colorConsole(config.get('log'));
 var router = express.Router();
 
@@ -16,25 +17,52 @@ events.emitter.on("db_data",function(){
 });
 
 /* GET home page. */
-router.get('/activities',function(req,res){
+router.get('/attractions',params({query:['id']}),function(req,res){
   citytable.find({_id:new ObjectId(req.query.id)},"activities",function(err,rows){
     res.json(rows);
   })
 });
-router.get('/city',function(req,res){
+router.get('/city',params({query:['search']}),function(req,res){
   if(req.query.search&&req.query.search.length>2) {
     var re = new RegExp(""+req.query.search+"", 'i');
     citytable.find({name: {$regex: re}}, "name state", function (err, rows) {
       rows.sort(function(a, b){return  a.name.toLowerCase().indexOf(req.query.search.toLowerCase())-b.name.toLowerCase().indexOf(req.query.search.toLowerCase())});
-      res.json(rows);
+      res.json({result:rows});
     })
   }else{
     res.status(400).json(config.get('error.badrequest'))
   }
 });
-router.get('/itinery',function(req,res){
-  citytable.find({_id:new ObjectId(req.query.id)},"activities",function(err,rows){
-    res.json(rows);
-  })
+router.get('/itinery',params({query:['city_id','pois','start_date','end_date']}),function(req,res){
+  if(pois.length>0) {
+    citytable.find({_id: new ObjectId(req.query.city_id),activities:{$in:req.query.pois}}, "activities", function (err, rows) {
+      var response = planTrip(rows,start_date,end_date);
+      res.json(response);
+    });
+  }else{
+    citytable.find({_id: new ObjectId(req.query.city_id)}, "activities", function (err, rows) {
+      var response = planTrip(rows,req.query.start_date,req.query.end_date);
+      res.json(response);
+    });
+  }
 });
+
+function planTrip(rows,start_date,end_date){
+  var start_date=new Date(start_date);
+  var end_date=new Date(end_date);
+
+  var diffDays = Math.round(Math.abs((start_date.getTime() - end_date.getTime())/(24*60*60*1000)));
+
+  var response={};
+  for(var i=0;i<rows.length;i++){
+    for(var j=0;j<diffDays;j++){
+      if(!response[j]){
+        response[j]=[];
+      }
+      if(response[j].length<(rows.length/diffDays).toFixed(0)) {
+        response[j].push(rows[i]);
+      }
+    }
+  }
+}
 module.exports = router;

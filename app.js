@@ -7,7 +7,9 @@ var bodyParser = require('body-parser');
 var config = require('config');
 var log = require('tracer').colorConsole(config.get('log'));
 var events = require('./events');
-var db=require('./database/schema')
+var db=require('./database/schema');
+var params = require('parameters-middleware');
+
 var ObjectId = require('mongoose').Types.ObjectId;
 var routes = require('./routes/index');
 var users = require('./routes/users');
